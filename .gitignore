@@ -1,0 +1,6 @@
+__pycache__/
+.venv/
+file/
+note.ipynb
+script.ipynb
+search.py
