@@ -4,143 +4,113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hierarchical Dropdown Menu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
     <div class="center-container">
-        <!-- Search Bar -->
-        <input type="text" id="search-input" placeholder="Search..." oninput="showSuggestions(this.value)">
-        
-        <!-- Suggestions dropdown will appear here -->
-        <div id="suggestions"></div>
+        <div class="center-container">
+            <!-- Search Bar -->
+            <div class="search-drop">
+                <div class="container mt-3">
+                    <input type="text" class="form-control" id="search-input" placeholder="Search..." oninput="fetchSuggestions(this.value)">
+                </div>
+                <div class="container mt-3">
+                
+                    <select id="search-dropdown" class="form-select">
+                      
+                    </select>
+                  </div>
+                <!-- Suggestions dropdown will appear here -->
+                
+            </div>
+            <div class="container list">
+                <ul class="dropdown-menu" id="suggestions-list" style="position: absolute;">
+                    <!-- Suggestions will be dynamically inserted here -->
+                </ul>
+            </div>
+        </div>
     </div>
 
     <script>
-        (function() {
-            function showSuggestions(query, event) {
-                if (event) event.preventDefault();
-                const suggestionsDiv = document.getElementById("suggestions");
-                
-                if (query.length < 4) {
-                    suggestionsDiv.innerHTML = "";
-                    return;
-                }
-                arraySize=0
-                fetch(`/suggestions?q=${query}`)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        arraySize=data.length
-                        if (typeof data === "object" && !Array.isArray(data)) {
-                            data = [data]; // Wrap the object in an array
-                        } else if (!Array.isArray(data)) {
-                            console.error("Expected data to be an array or an object but received:", data);
-                            return;
-                        }
-                        console.log("resu "+data[0])
-                        if (data[0]== "no match found, use job description as alternative search term") {
-                            suggestionsDiv.innerHTML = `<div class="no-results">${data[0]}</div>`;
-                            return;
-                        }
-
-                        // Build the suggestion tree from the fetched data
-                        const suggestionTree = buildTree(data);
-
-                        // Build the dropdown and display it
-                        suggestionsDiv.innerHTML = "";
-                        suggestionsDiv.appendChild(buildDropdownMenu(suggestionTree));
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching suggestions:", error);
-                    });
+        
+        async function fetchSuggestions(query) {
+            const suggestionsList = document.getElementById("suggestions-list");
+            const selectElement = document.getElementById('search-dropdown');
+            suggestionsList.innerHTML = ""; // Clear any existing suggestions
+        
+            // Clear existing options in the dropdown
+            selectElement.innerHTML = ""; // This will reset the options in the dropdown every time
+        
+            // Only fetch if query is not empty
+            if (query.trim() === "") {
+                suggestionsList.classList.remove("show");
+                return;
             }
-
-            // Function to build a tree structure from flat data
-            function buildTree(itemArray) {
-                const suggestionTree = {};
-
-                itemArray.forEach(item => {
-                    const jobTitle = item.job_title || "Unknown Title";
-                    const specializationId = item.specialization_id || "Unknown Specialization";
-
-                    const newNode = { 
-                        title: jobTitle, 
-                        specialization_id: specializationId, 
-                        sub: item.sub || []  // Assume sub-items are provided as an array
-                    };
-                    suggestionTree[specializationId] = newNode;
-                });
-
-                return suggestionTree;
-            }
-            
-            // Function to build the dropdown menu
-            function buildDropdownMenu(menuTree) {
-                
-                const searchInput = document.getElementById("search-input");
-                const ul = document.createElement("ul");
-                ul.className = "dropdown-menu";
-
-                Object.keys(menuTree).forEach((key) => {
-                    const currentItem = menuTree[key];
+        
+            try {
+                // Fetch data from the API endpoint
+                const response = await fetch(`/suggestions?q=${query}`);
+                const data = await response.json();
+        
+                if (data.message) {
                     const li = document.createElement("li");
-                    li.className = "dropdown-item";
-                   
-                    // Display the number of sub-items before the title
-                    li.innerText = `${currentItem.specialization_id} - ${currentItem.title}`;
-
-                    // Add click event listener to each list item
-                    li.addEventListener('click', function(e) {
-                        e.stopPropagation(); // Prevent event bubbling
-
-                        // Set search input to the clicked item's title and code
-                        searchInput.value = li.innerText;
-
-                        // Fetch child items using the clicked item's specialization_id
-                        fetchChildren(currentItem.specialization_id);
+                    li.className = "dropdown-item"; // Bootstrap styling for dropdown items
+                    li.textContent = data.message;
+                    suggestionsList.appendChild(li);
+                }
+                // Check if there are results
+                else if (data.length > 0) {
+                    suggestionsList.classList.add("show"); // Show the dropdown
+        
+                    // Populate the dropdown with fetched suggestions
+                    data.forEach(item => {
+                        const li = document.createElement("li");
+                        li.className = "dropdown-item"; // Bootstrap styling for dropdown items
+                        li.textContent = `${item.ofo_code} - ${item.job_title} - ${item.source}`; // Assume each item in `data` is a string
+        
+                        // When a suggestion is clicked, populate the input and hide the dropdown
+                        li.onclick = function () {
+                            document.getElementById("search-input").value = `${item.ofo_code} - ${item.job_title} - ${item.source}`;
+                            suggestionsList.innerHTML = ""; // Clear suggestions
+                            suggestionsList.classList.remove("show"); // Hide dropdown
+        
+                            // Handle the select dropdown logic
+                            if (!item.specialization) {
+                                const option = document.createElement("option"); // Create a new option element
+                                // Set the value and text content for the option
+                                option.value = `${item.ofo_code}`;
+                                option.textContent = `${item.ofo_code} - ${item.job_title} - ${item.source}`;
+        
+                                // Append the new option to the select element
+                                selectElement.appendChild(option);
+                            } else if (item.specialization.length > 0) {
+                                special_list = item.specialization;
+                                special_list.forEach((items, index) => {
+                                    const option = document.createElement("option"); // Create a new option element
+                                    // Set the value and text content for the option
+                                    option.value = `${items.ofo_code}`;
+                                    option.textContent = `${items.ofo_code} - ${items.job_title} - ${items.source}`;
+        
+                                    
+        
+                                    // Append the new option to the select element
+                                    selectElement.appendChild(option);
+                                });
+                            }
+                        };
+        
+                        suggestionsList.appendChild(li);
                     });
-
-                    ul.appendChild(li);
-                });
-
-                return ul;
+                } else {
+                    suggestionsList.classList.remove("show"); // Hide dropdown if no matches
+                }
+            } catch (error) {
+                console.error("Error fetching suggestions:", error);
             }
-
-            // Function to fetch child items and rebuild the dropdown
-            function fetchChildren(specializationId) {
-                const suggestionsDiv = document.getElementById("suggestions");
-
-                // Payload for the /parent endpoint
-                const payload = { search_term: specializationId };
-
-                fetch('/parent', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data); // Debugging: check response data
-
-                    if (data.length === 0) {
-                        suggestionsDiv.innerHTML = '<div class="no-results">No results found</div>';
-                        return;
-                    }
-
-                    // Build the new dropdown menu with child items
-                    const suggestionTree = buildTree(data);
-                    suggestionsDiv.innerHTML = ""; // Clear previous suggestions
-                    suggestionsDiv.appendChild(buildDropdownMenu(suggestionTree)); // Rebuild dropdown
-                })
-                .catch((error) => {
-                    console.error('Error fetching data:', error);
-                });
-            }
-
-            // Expose the showSuggestions function globally
-            window.showSuggestions = showSuggestions;
-        })();
+        }
+        
+        
     </script>
 </body>
 </html>
