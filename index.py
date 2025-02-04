@@ -4,6 +4,8 @@ from flask import jsonify, request,render_template
 import json
 from database_query import search_for_job_codes
 import ast
+from database_query import conn
+print("connection ", conn)
 app = Flask(__name__)
 
 
@@ -13,7 +15,7 @@ def index():
     return render_template('index.html')
 
 @app.route("/job_title/<job_title>")
-def input_job_title(job_title):
+def input_job_title(job_title): 
     # Call the filtering function with the job_title
     if not job_title:
         return jsonify([])

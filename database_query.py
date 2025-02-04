@@ -1,18 +1,24 @@
 import pypyodbc as odbc
 
 
+# Offline 
+# DRIVER_NAME='SQL SERVER'
+# SERVER_NAME='APB-JBS02-113L\SQLEXPRESS'
+# DATABASE_NAME='database_ofo'
 
-DRIVER_NAME='SQL SERVER'
-SERVER_NAME='APB-JBS02-113L\SQLEXPRESS'
-DATABASE_NAME='database_ofo'
+# online
+# DRIVER_NAME='ODBC Driver 17 for SQL Server'
+# SERVER_NAME='102.23.201.12\IMS'
+# DATABASE_NAME='chieta_ofo'
+# PASSWORD='0foAdmin123$'
+# USERNAME='ofo_service'
 
-connection_string=F"""
-    DRIVER={{{DRIVER_NAME}}};
-    SERVER={SERVER_NAME};
-    DATABASE={DATABASE_NAME};
-    Trust_Connection=yes
-"""
-conn=odbc.connect(connection_string)
+def get_connection():
+    connection_string = "DRIVER={SQL Server};SERVER=102.23.201.12\IMS;DATABASE=chieta_ofo;UID=ofo_service;PWD=0foAdmin123$"
+
+    return odbc.connect(connection_string)
+
+conn=get_connection()
 
 
 

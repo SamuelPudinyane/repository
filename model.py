@@ -19,8 +19,8 @@ def preprocess_text(text):
         return ""
 
 # Load the saved TF-IDF model and matrix
-loaded_tfidf = joblib.load('tfidf_model_joblib.pkl')
-tfidf_matrix = joblib.load('tfidf_matrix_joblib.pkl')
+loaded_tfidf = joblib.load('tfidf_vectorizer.pkl')
+tfidf_matrix = joblib.load('tfidf_matrix.pkl')
 
 # Load your job data DataFrame
 df = pd.read_csv('job_data_with_tfidf.csv')

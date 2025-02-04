@@ -8,7 +8,7 @@
 
 /* Style the search bar */
 #search-input {
-    width: 600px;
+    width: 450px;
     padding: 5px;
     margin-bottom: 20px;
     font-size: 16px;
@@ -20,13 +20,13 @@
     position: relative;
 }
 .form-select{
-    width: 600px;
+    width: 300px;
 }
 .dropdown-menu {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    width: 600px;
+    width: 300px;
     color: black;
 }
 .search-drop{
