@@ -14,11 +14,11 @@ import pypyodbc as odbc
 # USERNAME='ofo_service'
 
 def get_connection():
-    connection_string = "DRIVER={SQL Server};SERVER=102.23.201.12\IMS;DATABASE=chieta_ofo;UID=ofo_service;PWD=0foAdmin123$"
+    connection_string = "DRIVER={SQL Server};SERVER=102.23.201.12\IMS;DATABASE=chieta_ofo;UID=ofo_service;PWD=0foAdmin123$;MARS_Connection=yes"
 
     return odbc.connect(connection_string)
 
-conn=get_connection()
+
 
 
 
@@ -26,6 +26,7 @@ def search_for_job_codes(id):
     """Search for a specific job title (case-insensitive) across multiple tables and return matching rows with all columns.
     Using %...% wildcard operation to search for any results that has the same unput title
     """
+    conn=get_connection()
     try:
         if conn:
             cursor = conn.cursor()
@@ -73,7 +74,7 @@ with the list of results from the model, do the search again from the database t
 data=[]
           
 def search_for_job_titles(conn, title):
-    
+    conn=get_connection()
     """
     Search for a specific job title (case-insensitive) across multiple tables and return matching rows with all columns.
     Create a nested dictionary where entries are nested under their parent based on specialization_id relationships.
@@ -127,6 +128,7 @@ def search_for_job_titles_abbreviation(conn, title):
     Search for a specific job title (case-insensitive) across multiple tables and return matching rows with all columns.
     Create a nested dictionary where entries are nested under their parent based on specialization_id relationships.
     """
+    conn=get_connection()
     try:
         if conn:
             cursor = conn.cursor()
@@ -181,7 +183,7 @@ def search_for_job_titles_abbreviation(conn, title):
 
 
 def search_for_job_titles_with_ofo_code(conn, ofo_code):
-    
+    conn=get_connection()
 
     try:
         if conn:
@@ -227,6 +229,7 @@ def search_for_job_titles_with_ofo_code(conn, ofo_code):
     
 def search_for_job_titles_for_model(conn, title):
     print("this ",title)
+    conn=get_connection()
     if type(title)==list:
         output=[]
         for item in title:

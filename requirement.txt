@@ -70,3 +70,4 @@ wcwidth==0.2.13
 Werkzeug==3.0.4
 wrapt==1.16.0
 gunincorn
+Quart==0.20.0

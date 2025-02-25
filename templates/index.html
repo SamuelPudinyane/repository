@@ -8,17 +8,34 @@
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <img src="{{ url_for('static',filename='../static/images/CHIETA-Logo.webp')}}" alt="CHIETA Logo" style="width: 150px; height: auto;">
+            </a>
+        </div>
+    </nav>
     <div class="center-container">
         <div class="center-container">
+            <p class="search_suggestion_list_box">
+                Please search for a job title using the options below in the search box:
+
+                <ul style="list-style:none; padding-left:0">
+                <li>✅ Job Title</li>
+                <li>✅ Job Title Abbreviation</li>
+                <li>✅ Job Description</li>
+                </ul>
+            </p>
             <!-- Search Bar -->
             <div class="search-drop">
                 <div class="container mt-3">
-                    <input type="text" class="form-control" id="search-input" placeholder="Search..." oninput="fetchSuggestions(this.value)">
+                    <input type="text" class="form-control" id="search-input" placeholder="Search for job title" oninput="fetchSuggestions(this.value)">
                 </div>
                 <div class="container mt-3">
                 
                     <select id="search-dropdown" class="form-select">
-                      
+                        <option value="" disabled selected>-- Select an option --</option>
                     </select>
                   </div>
                 <!-- Suggestions dropdown will appear here -->

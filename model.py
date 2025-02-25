@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 import json
-from database_query import search_for_job_titles, conn,search_for_job_titles_abbreviation,search_for_job_titles_with_ofo_code,search_for_job_titles_for_model
+from database_query import search_for_job_titles,get_connection,search_for_job_titles_abbreviation,search_for_job_titles_with_ofo_code,search_for_job_titles_for_model
 import ast
 # Preprocess function for cleaning text
 def preprocess_text(text):
@@ -80,6 +80,7 @@ def load_data_from_model(title):
 
 # Function to filter and return suggestions or search results
 def filtering(search_term):
+    conn=get_connection()
     results = search_for_job_titles(conn, search_term)
     if results:
         for item in results:
@@ -139,16 +140,16 @@ def filtering(search_term):
 
 
 def filtering_abb(search_term):
+    conn=get_connection()
     results = search_for_job_titles_abbreviation(conn, search_term)
     
     for item in results:
         output=search_for_job_titles_with_ofo_code(conn,item['ofo_code'])
         if output:
-            if output:
-                if item['source']=='occupation':
-                    item["specialization"]=output
-                else:
-                    item=output
+            if item['source']=='occupation':
+                item["specialization"]=output
+            else:
+                item=output
     if results:
         # If the title is found in the database, return the results as JSON
         return json.dumps(results)

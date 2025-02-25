@@ -57,3 +57,16 @@
 .list ul{
     width: 600px;
 }
+/* Navbar styling */
+.navbar {
+    background-color: #6c2cc0;
+    padding: 10px;
+}
+
+.navbar-brand, .nav-link {
+    color: white !important;
+}
+.search_suggestion_list_box ul {
+    list-style: none;
+    padding-left: 0; 
+}

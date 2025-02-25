@@ -4,8 +4,8 @@ from flask import jsonify, request,render_template
 import json
 from database_query import search_for_job_codes
 import ast
-from database_query import conn
-print("connection ", conn)
+from database_query import get_connection
+print("connection ", get_connection())
 app = Flask(__name__)
 
 
@@ -19,10 +19,11 @@ def input_job_title(job_title):
     # Call the filtering function with the job_title
     if not job_title:
         return jsonify([])
-    if len(job_title)>2:
-        job_titles = filtering(job_title)
-    else:
+    if len(job_title)<3:
+
         job_titles=filtering_abb(job_title)
+    else:
+        job_titles = filtering(job_title)
     
     if job_titles and "message" not in job_titles:
         job_titles=ast.literal_eval(job_titles)
@@ -59,4 +60,4 @@ def search():
             
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
