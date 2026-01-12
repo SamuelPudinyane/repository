@@ -5,8 +5,11 @@ import json
 from database_query import search_for_job_codes
 import ast
 from database_query import get_connection
+import os
+
 print("connection ", get_connection())
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 
 @app.route('/')
@@ -60,4 +63,9 @@ def search():
             
 
 if __name__ == '__main__':
-    app.run()
+    # Get configuration from environment variables
+    host = os.environ.get('HOST', '0.0.0.0')
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
+    
+    app.run(host=host, port=port, debug=debug)

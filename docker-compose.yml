@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Flask Application
+  web:
+    build: .
+    container_name: ofo_database_app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+      - DB_SERVER=${DB_SERVER:-sqlserver}
+      - DB_NAME=${DB_NAME:-ofo_db}
+      - DB_USER=${DB_USER:-sa}
+      - DB_PASSWORD=${DB_PASSWORD:-YourStrong@Passw0rd}
+    volumes:
+      - ./:/app
+      - ./static:/app/static
+      - ./templates:/app/templates
+    depends_on:
+      - sqlserver
+    networks:
+      - ofo_network
+    restart: unless-stopped
+
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ofo_sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - ofo_network
+    restart: unless-stopped
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+networks:
+  ofo_network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+    driver: local
